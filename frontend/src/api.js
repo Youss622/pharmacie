@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://pharmacie-leyr.onrender.com/api/',
+    baseURL: 'http://localhost:8000/api/',
 });
 
 api.interceptors.request.use(
@@ -16,3 +16,16 @@ api.interceptors.request.use(
 );
 
 export default api;
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        // Redirection silencieuse vers la page de login si le jeton expire
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
